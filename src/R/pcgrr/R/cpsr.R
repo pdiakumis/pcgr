@@ -311,9 +311,12 @@ assign_pathogenicity_evidence <- function(cpg_calls, cpsr_config, pcgr_data){
   if(gad_AN_tag %in% colnames(cpg_calls) & gad_AC_tag %in% colnames(cpg_calls) & gad_NHOMALT_tag %in% colnames(cpg_calls)){
 
     cpg_calls <- cpg_calls %>%
-      dplyr::mutate(gad_af = dplyr::if_else(!!rlang::sym(gad_AN_tag) >= min_an, as.numeric(!!rlang::sym(gad_AC_tag)/!!rlang::sym(gad_AN_tag)),as.double(NA),as.double(NA)))
+      dplyr::mutate(gad_af = dplyr::if_else(as.numeric(!!rlang::sym(gad_AN_tag)) >= min_an,
+                                            as.numeric(as.numeric(!!rlang::sym(gad_AC_tag))/as.numeric(!!rlang::sym(gad_AN_tag))),
+                                            as.double(NA),as.double(NA)))
     cpg_calls <- cpg_calls %>%
-      dplyr::mutate(ACMG_PM2_1 = dplyr::if_else(!!rlang::sym(gad_AN_tag) >= min_an & !is.na(!!rlang::sym(gad_AC_tag)) & gad_af <= pathogenic_range_af,TRUE,FALSE,FALSE))
+      dplyr::mutate(ACMG_PM2_1 = dplyr::if_else(as.numeric(!!rlang::sym(gad_AN_tag)) >= min_an &
+                        !is.na(!!rlang::sym(gad_AC_tag)) & gad_af <= pathogenic_range_af,TRUE,FALSE,FALSE))
     cpg_calls <- cpg_calls %>%
       dplyr::mutate(ACMG_PM2_2 = dplyr::if_else(is.na(!!rlang::sym(gad_AC_tag)),TRUE,FALSE,FALSE))
     cpg_calls <- cpg_calls %>%
